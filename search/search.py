@@ -103,6 +103,7 @@ def depthFirstSearch(problem):
     "*** YOUR CODE HERE ***"
     from game import Directions
 
+
     start = problem.getStartState() #(5,5)
     s = util.Stack()
     closed = set()
@@ -123,7 +124,7 @@ def depthFirstSearch(problem):
             successors = problem.getSuccessors(cell_path[0])
             for move in successors:
                 trail = (move, cell_path[1].append(dir(move[1]))
-                s.push(move)
+                s.push(trail)
 
     return None
 
