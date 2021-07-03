@@ -75,13 +75,15 @@ def tinyMazeSearch(problem):
 def dir(x):
     from game import Directions
 
-    if x.lower() == "north" or "up":
+    x = x.lower()
+
+    if x == "north" or x == "up":
         return Directions.NORTH
-    elif x.lower() == "east" or "right":
+    elif x == "east" or x == "right":
         return Directions.EAST
-    elif x.lower() == "south" or "down":
+    elif x == "south" or x == "down":
         return Directions.SOUTH
-    elif x.lower() == "west" or "left":
+    elif x == "west" or x == "left":
         return Directions.WEST
 
 def depthFirstSearch(problem):
@@ -114,7 +116,7 @@ def depthFirstSearch(problem):
     while not s.isEmpty():
         current_move = s.pop()
         if problem.isGoalState(current_move[0]):
-            return path.add(dir(current_move[1]))
+            return path.append(dir(current_move[1]))
         if current_move[0] not in closed:
             closed.add(current_move[0])
             successors = problem.getSuccessors(current_move[0])
