@@ -72,6 +72,18 @@ def tinyMazeSearch(problem):
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
 
+def dir(x):
+    from game import Directions
+
+    if x.lower() == "north" or "up":
+        return Directions.NORTH
+    elif x.lower() == "east" or "right":
+        return Directions.EAST
+    elif x.lower() == "south" or "down":
+        return Directions.SOUTH
+    elif x.lower() == "west" or "left":
+        return Directions.WEST
+
 def depthFirstSearch(problem):
     """
     Search the deepest nodes in the search tree first.
@@ -91,24 +103,25 @@ def depthFirstSearch(problem):
 
     start = problem.getStartState() #(5,5)
     s = util.Stack()
+    closed = set()
+    path = []
 
-    starting_moves = problem.getSuccessors(start)
+    starting_moves = problem.getSuccessors(start) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
     for move in starting_moves:
         s.push(move)
+    closed.add(start)
 
     while not s.isEmpty():
         current_move = s.pop()
-        successors = problem.getSuccessors(current_move[0]) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
-        for move in successors:
-            s.push(move)
-        current = problem.getSuccessors(current)
+        if problem.isGoalState(current_move[0]):
+            return path.add(dir(current_move[1]))
+        if current_move[0] not in closed:
+            closed.add(current_move[0])
+            successors = problem.getSuccessors(current_move[0])
+            for move in successors:
+                s.push(move)
 
-
-    print("Start: ", start)
-    print("Successors: ", successors)
-
-
-    util.raiseNotDefined()
+    return None
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
