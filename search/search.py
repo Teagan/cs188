@@ -87,10 +87,25 @@ def depthFirstSearch(problem):
     print("Start's successors:", problem.getSuccessors(problem.getStartState()))
     """
     "*** YOUR CODE HERE ***"
+    from game import Directions
 
-    node 
+    start = problem.getStartState() #(5,5)
+    s = util.Stack()
 
-    return 
+    starting_moves = problem.getSuccessors(start)
+    for move in starting_moves:
+        s.push(move)
+
+    while not s.isEmpty():
+        current_move = s.pop()
+        successors = problem.getSuccessors(current_move[0]) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
+        for move in successors:
+            s.push(move)
+        current = problem.getSuccessors(current)
+
+
+    print("Start: ", start)
+    print("Successors: ", successors)
 
 
     util.raiseNotDefined()
