@@ -106,21 +106,23 @@ def depthFirstSearch(problem):
     start = problem.getStartState() #(5,5)
     s = util.Stack()
     closed = set()
-    path = []
+
 
     starting_moves = problem.getSuccessors(start) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
     for move in starting_moves:
-        s.push(move)
+        trail = (move, [dir(move[1])])
+        s.push(trail)
     closed.add(start)
 
     while not s.isEmpty():
-        current_move = s.pop()
-        if problem.isGoalState(current_move[0]):
-            return path.append(dir(current_move[1]))
-        if current_move[0] not in closed:
-            closed.add(current_move[0])
-            successors = problem.getSuccessors(current_move[0])
+        cell_path = s.pop()
+        if problem.isGoalState(cell_path[0]):
+            return cell_path[1]
+        if cell_path[0] not in closed:
+            closed.add(cell_path[0])
+            successors = problem.getSuccessors(cell_path[0])
             for move in successors:
+                trail = (move, cell_path[1].append(dir(move[1]))
                 s.push(move)
 
     return None
