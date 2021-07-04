@@ -116,12 +116,60 @@ def depthFirstSearch(problem):
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState() #(5,5)
+    q = util.Queue()
+    closed = set()
+
+
+    starting_moves = problem.getSuccessors(start) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
+    for move in starting_moves:
+        trail = (move, [move[1]])
+        q.push(trail)
+    closed.add(start)
+
+    while not q.isEmpty():
+        cell_path = q.pop()
+        if problem.isGoalState(cell_path[0][0]):
+            return cell_path[1]
+        if cell_path[0][0] not in closed:
+            closed.add(cell_path[0][0])
+            successors = problem.getSuccessors(cell_path[0][0])
+            for move in successors:
+                updated_path = list(cell_path[1])
+                updated_path.append(move[1])
+                trail = (move, updated_path)
+                q.push(trail)
+
+    return None
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start = problem.getStartState() #(5,5)
+    pq = util.PriorityQueue()
+    closed = set()
+
+
+    starting_moves = problem.getSuccessors(start) #[((5,4), 'South', 1), ((4,5), 'West', 1)]
+    for move in starting_moves:
+        trail = (move, [move[1]])
+        pq.push(trail, problem.getCostOfActions([move[1]]))
+    closed.add(start)
+
+    while not pq.isEmpty():
+        cell_path = pq.pop()
+        if problem.isGoalState(cell_path[0][0]):
+            return cell_path[1]
+        if cell_path[0][0] not in closed:
+            closed.add(cell_path[0][0])
+            successors = problem.getSuccessors(cell_path[0][0])
+            for move in successors:
+                updated_path = list(cell_path[1])
+                updated_path.append(move[1])
+                trail = (move, updated_path)
+                pq.push(trail, problem.getCostOfActions(updated_path))
+
+    return None
 
 def nullHeuristic(state, problem=None):
     """
