@@ -330,13 +330,11 @@ class CornersProblem(search.SearchProblem):
             "*** YOUR CODE HERE ***"
             #states are of the form ((x,y), (0,0,0,0)) and both must be updated when 
             # adding successors
-            print("state    :  ", state)
             (x,y) = state[0]
             corners = state[1]
             dx, dy = Actions.directionToVector(action)
             nextx, nexty = int(x + dx), int(y + dy)
             hitsWall = self.walls[nextx][nexty]
-            print("next     :  ", (nextx, nexty))
 
             if not hitsWall:
                 if (nextx, nexty) in self.corners:
@@ -347,7 +345,6 @@ class CornersProblem(search.SearchProblem):
                 successors.append((new_state, action, 1))
 
         self._expanded += 1 # DO NOT CHANGE
-        print("successors:  ", successors)
         return successors
 
     def getCostOfActions(self, actions):
@@ -381,7 +378,15 @@ def cornersHeuristic(state, problem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0 # Default to trivial solution
+    (x,y) = state[0]
+    corners_visited = list(state[1])
+    heuristic = 0
+
+    for (x_c, y_c) in problem.corners:
+        if corners_visited[problem.corners.index((x_c, y_c))] == 0:
+            heuristic += util.manhattanDistance((x,y), (x_c, y_c))
+
+    return heuristic
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
