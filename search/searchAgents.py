@@ -381,12 +381,17 @@ def cornersHeuristic(state, problem):
     (x,y) = state[0]
     corners_visited = list(state[1])
     heuristic = 0
+    corners_left = 0
 
     for (x_c, y_c) in problem.corners:
         if corners_visited[problem.corners.index((x_c, y_c))] == 0:
             heuristic += util.manhattanDistance((x,y), (x_c, y_c))
-
-    return heuristic
+            corners_left += 1
+    
+    if corners_left == 0:
+        return 0
+    else:
+        return heuristic // corners_left
 
 class AStarCornersAgent(SearchAgent):
     "A SearchAgent for FoodSearchProblem using A* and your foodHeuristic"
