@@ -29,6 +29,9 @@ class ReflexAgent(Agent):
     headers.
     """
 
+    def __init__(self):
+        self.last_moves = []
+
 
     def getAction(self, gameState):
         """
@@ -76,9 +79,20 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
         get_score_weight = 1
-        food_dist_weight = 1
-        closest_food_weight = 5
-        ghost_dist_weight = 0.5
+        food_dist_weight = 10
+        closest_food_weight = 10
+        ghost_dist_weight = 2
+        weak_ghost_weight = 100
+        revisit_weight = 20
+
+
+
+        revisit_penalty = 1 if (newPos in self.last_moves) else 0
+
+        self.last_moves.append(newPos)
+        if len(self.last_moves) > 6:
+            self.last_moves = self.last_moves[1:len(self.last_moves)]
+
 
 
         food_dist = [[None for j in range(newFood.width)] for i in range(newFood.height)]
@@ -92,6 +106,9 @@ class ReflexAgent(Agent):
                 sum_food_dist += val
                 closest_food_dist = val if ((val < closest_food_dist) and (val != 0)) else closest_food_dist
                 food_dist[col][row] = val
+
+        sum_food_dist = 1 if (sum_food_dist == 0) else sum_food_dist
+
 
 
         ghost_distances = []
@@ -116,6 +133,7 @@ class ReflexAgent(Agent):
             + 1/sum_food_dist * food_dist_weight \
             + 1/closest_food_dist * closest_food_weight \
             + ghost_dist * ghost_dist_weight \
+            - revisit_penalty * revisit_weight \
             #- stuck_penalty
 
 
@@ -123,7 +141,8 @@ class ReflexAgent(Agent):
         print("Score             :  ", successorGameState.getScore())
         print("Total food dist   :  1/", sum_food_dist)
         print("Closest food dist :  1/", closest_food_dist)
-        print("Ghost distances   :  ", ghost_dist)
+        print("Ghost distances   :  -", ghost_dist)
+        print("Revisited?        :  -", revisit_penalty)
 
         return score
 
