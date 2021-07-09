@@ -364,12 +364,9 @@ class CornersProblem(search.SearchProblem):
 def cornersHeuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
-
       state:   The current search state
                (a data structure you chose in your search problem)
-
       problem: The CornersProblem instance for this layout.
-
     This function should always return a number that is a lower bound on the
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
@@ -484,8 +481,22 @@ def foodHeuristic(state, problem):
     problem.heuristicInfo['wallCount']
     """
     position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    "*** YOUR CODE HERE ***"    
+    from pacman import GameState
+
+    dist_closest_food = foodGrid.width * foodGrid.height +  1
+
+    temp = GameState(state)
+
+    for y in range(foodGrid.height):
+        for x in range(foodGrid.width):
+            if foodGrid[x][y]:
+                new_dist = mazeDistance(position, (x,y), temp)
+                if new_dist < dist_closest_food:
+                    dist_closest_food = new_dist
+
+
+    return dist_closest_food
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -516,7 +527,11 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        return search.breadthFirstSearch(problem)
+        
+
+
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -552,7 +567,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return self.food[state[0]][state[1]]
 
 def mazeDistance(point1, point2, gameState):
     """
