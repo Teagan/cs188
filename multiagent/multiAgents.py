@@ -76,6 +76,7 @@ class ReflexAgent(Agent):
         newFood = successorGameState.getFood()
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+        
 
         "*** YOUR CODE HERE ***"
         get_score_weight = 1
@@ -93,6 +94,9 @@ class ReflexAgent(Agent):
         if len(self.last_moves) > 10: # number of moves it keeps track of
             self.last_moves = self.last_moves[1:len(self.last_moves)]
 
+
+        # edible_ghosts = sum(newScaredTimes)
+        # ghost_dist_weight = -ghost_dist_weight if edible_ghosts > 0 else ghost_dist_weight
 
 
         food_dist = [[None for j in range(newFood.width)] for i in range(newFood.height)]
@@ -134,8 +138,6 @@ class ReflexAgent(Agent):
             + 1/closest_food_dist * closest_food_weight \
             + ghost_dist * ghost_dist_weight \
             - revisit_penalty * revisit_weight \
-            #- stuck_penalty
-
 
         # print("Current evaluation function  :   ", score)
         # print("Score             :  ", successorGameState.getScore())
@@ -181,6 +183,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
     Your minimax agent (question 2)
     """
 
+    def max_value(self, gameState, depth):
+        if gameState.isWin() or gameState.isLose() or depth > self.depth:
+            return self.evaluationFunction(gameState)
+        max_val = -float('inf')
+        max_action = None
+        for action in gameState.getLegalActions(0):
+            for ghost_index in range(1, gameState.getNumAgents()):
+                (new_action, new_val) = self.min_value(ghost_index, gameState.generateSuccessor(ghost_index, action), depth)
+                if new_val > max_val:
+                    max_val = new_val
+                    max_action = new_action
+        return (max_val, max_action)
+
+
+    def min_value(self, ghost_index, gameState, depth):
+        if gameState.isWin() or gameState.isLose() or depth > self.depth:
+            return self.evaluationFunction(gameState)
+        min_val = float('inf')
+        min_action = None
+        for action in gameState.getLegalActions(ghost_index): 
+            (new_action, new_val) = self.min_value(ghost_index, gameState.generateSuccessor(ghost_index, action), depth)
+            if new_val < min_val:
+                min_val = new_val
+                min_action = new_action
+        return (min_val, min_action)
+
+
     def getAction(self, gameState):
         """
         Returns the minimax action from the current gameState using self.depth
@@ -205,7 +234,23 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        # first is maximization of pacman
+        # then go through one layer of minimization per ghost
+        # repeat this self.depth times or until gamestate.iswin() or gamestate.islose()
+        # float('inf') is the biggest number in python
+        # if there are no legal actions for an agent on a certain board state of your minimax 
+        # tree you should return evaluationFunction() called on the board state corresponding 
+        # to that node. I was returning 0 initially and that turned out to cause issues.
+        # when calculating the value of a leaf node, use evaluationFunction()
+
+
+        #adjust depending on desired depth
+        return self.max_value(gameState, self.depth)
+
+
+
+
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
