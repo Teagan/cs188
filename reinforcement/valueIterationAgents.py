@@ -67,13 +67,12 @@ class ValueIterationAgent(ValueEstimationAgent):
         # of value iteration, returning nothing.
         # V_{k+1} = max_a sum_{s'} T(s,a,s') [ R(s,a,s') + \gamma V_k(s')]
 
-        v_k = self.values.copy()
         
         for i in range(self.iterations):
+            v_k = self.values.copy()
             for state in self.mdp.getStates():
                 self.values[state] = self.v_k_plus_1(state, v_k)
 
-                
             
     def v_k_plus_1(self, state, v_k):
         best = -float('inf')
