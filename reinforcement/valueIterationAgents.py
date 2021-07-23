@@ -181,6 +181,28 @@ class AsynchronousValueIterationAgent(ValueIterationAgent):
 
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        for i in range(self.iterations):
+            state = self.mdp.getStates()[i % len(self.mdp.getStates())]
+            self.values[state] = self.update_v(state)
+
+            
+    def update_v(self, state):
+        best = -float('inf')
+
+        for action in self.mdp.getPossibleActions(state):
+            curr_v = 0
+            for (s_prime, t) in self.mdp.getTransitionStatesAndProbs(state, action):
+                r = self.mdp.getReward(state, action, s_prime)
+                curr_v += t * (r + self.discount * self.values[s_prime])
+            if curr_v > best:
+                best = curr_v
+
+        if best == -float('inf'):
+            return 0
+
+        return best
+
+
 
 class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
     """
@@ -199,6 +221,82 @@ class PrioritizedSweepingValueIterationAgent(AsynchronousValueIterationAgent):
         self.theta = theta
         ValueIterationAgent.__init__(self, mdp, discount, iterations)
 
+    def youMayUpdateONCE(self, state):
+        best = -float('inf')
+
+        for action in self.mdp.getPossibleActions(state):
+            curr_v = 0
+            for (s_prime, t) in self.mdp.getTransitionStatesAndProbs(state, action):
+                r = self.mdp.getReward(state, action, s_prime)
+                curr_v += t * (r + self.discount * self.values[s_prime])
+            if curr_v > best:
+                best = curr_v
+
+        if best == -float('inf'):
+            return 0
+
+        return best
+
+
     def runValueIteration(self):
         "*** YOUR CODE HERE ***"
+        # Compute predecessors of all states.
+            # When you compute predecessors of a state, make sure to store them in a set, not a list, to avoid duplicates.
+        states = self.mdp.getStates()
+        predecessors = {}
 
+        for state in states:
+            for action in self.mdp.getPossibleActions(state):
+                for (s_prime, t) in self.mdp.getTransitionStatesAndProbs(state, action):
+                    if s_prime not in predecessors.keys():
+                        predecessors[s_prime] = set()
+                    predecessors[s_prime].add(state)
+
+        # Initialize an empty priority queue.
+            # Please use util.PriorityQueue in your implementation. The update method in this class will likely be useful; 
+            # look at its documentation.
+        pq = util.PriorityQueue()
+
+        # For each non-terminal state s, do: (note: to make the autograder work for this question, you must iterate over 
+        # states in the order returned by self.mdp.getStates())
+        for s in states:
+            if not self.mdp.isTerminal(s):
+                # Find the absolute value of the difference between the current value of s in self.values and the highest Q-value 
+                # across all possible actions from s (this represents what the value should be); call this number diff. Do NOT 
+                # update self.values[s] in this step.
+                best_q = -float('inf')
+                for action in self.mdp.getPossibleActions(s):
+                    q = self.computeQValueFromValues(s, action)
+                    best_q = q if q > best_q else best_q
+                diff = abs(self.getValue(s) - best_q)
+
+                # Push s into the priority queue with priority -diff (note that this is negative). We use a negative because the 
+                # priority queue is a min heap, but we want to prioritize updating states that have a higher error.
+                pq.push(s, priority = -diff)
+
+
+        # For iteration in 0, 1, 2, ..., self.iterations - 1, do: 
+        for i in range(self.iterations):
+            # If the priority queue is empty, then terminate.
+            if pq.isEmpty():
+                break
+            # Pop a state s off the priority queue.
+            s = pq.pop()
+            # Update the value of s (if it is not a terminal state) in self.values.
+            if not self.mdp.isTerminal(s):
+                self.values[s] = self.youMayUpdateONCE(s)
+            # For each predecessor p of s, do: 
+            for p in predecessors[s]:
+                # Find the absolute value of the difference between the current value of p in self.values and the highest 
+                # Q-value across all possible actions from p (this represents what the value should be); call this number 
+                # diff. Do NOT update self.values[p] in this step.
+                best_q = -float('inf')
+                for action in self.mdp.getPossibleActions(p):
+                    q = self.computeQValueFromValues(p, action)
+                    best_q = q if q > best_q else best_q
+                diff = abs(self.getValue(p) - best_q)
+                # If diff > theta, push p into the priority queue with priority -diff (note that this is negative), as long as 
+                # it does not already exist in the priority queue with equal or lower priority. As before, we use a negative 
+                # because the priority queue is a min heap, but we want to prioritize updating states that have a higher error.
+                if diff > self.theta:
+                    pq.update(p, -diff)
