@@ -46,7 +46,7 @@ class QLearningAgent(ReinforcementAgent):
         # self.mdp
         # self.discount
         # self.iterations
-        # self.values
+        self.q_values = util.Counter() # A Counter is a dict with default 0
 
     def getQValue(self, state, action):
         """
@@ -56,10 +56,10 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
 
-
-
-        util.raiseNotDefined()
-
+        if (state, action) not in self.q_values.keys():
+          return 0.0
+        return self.q_values[(state, action)]
+        
 
     def computeValueFromQValues(self, state):
         """
@@ -69,7 +69,18 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        if self.getLegalActions(state) == None: #assuming returns None if no legal actions
+          return 0.0
+
+        max_val = -float('inf')
+
+        for action in self.getLegalActions(state):
+          val = self.getQValue(state, action)
+          max_val = val if val > max_val else max_val
+
+        return max_val
+
 
     def computeActionFromQValues(self, state):
         """
@@ -78,9 +89,22 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
 
-    def getAction(self, state):
+        if self.getLegalActions(state) == None:
+          return None
+
+        max_val = -float('inf')
+        best_actions = []
+
+        for action in self.getLegalActions(state):
+          val = self.getQValue(state, action)
+          if val >= max_val:
+            best_actions.append(action)
+
+        return random.choice(best_actions) #get random best action
+
+
+    def getAction(self, state): 
         """
           Compute the action to take in the current state.  With
           probability self.epsilon, we should take a random action and
@@ -95,7 +119,16 @@ class QLearningAgent(ReinforcementAgent):
         legalActions = self.getLegalActions(state)
         action = None
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        
+        if legalActions == None: #assuming getlegalactions returns None for no legal actions
+          return None
+
+        #with probability self.epsilon, take random action
+        if util.flipCoin(self.epsilon):
+          action = random.choice(legalActions)
+        #else, best action
+        else:
+          
 
         return action
 
