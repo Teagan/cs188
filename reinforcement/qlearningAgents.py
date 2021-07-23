@@ -13,7 +13,7 @@
 
 
 from game import *
-from learningAgents import ReinforcementAgent
+from learningAgents import ReinforcementAgent 
 from featureExtractors import *
 
 import random,util,math
@@ -43,6 +43,10 @@ class QLearningAgent(ReinforcementAgent):
         ReinforcementAgent.__init__(self, **args)
 
         "*** YOUR CODE HERE ***"
+        # self.mdp
+        # self.discount
+        # self.iterations
+        # self.values
 
     def getQValue(self, state, action):
         """
@@ -51,6 +55,9 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
+
+
+
         util.raiseNotDefined()
 
 
