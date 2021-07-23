@@ -127,13 +127,17 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+        if self.mdp.isTerminal(state):
+            return None
+
         best_action = None
-        best_val = - float('inf')
+        best_action_val = -float('inf')
 
         for action in self.mdp.getPossibleActions(state):
-            if self.getValue(action) > best_val:
+            if self.computeQValueFromValues(state, action) > best_action_val:
                 best_action = action
-                best_val = self.getValue(action)
+                best_action_val = self.computeQValueFromValues(state, action)
+
 
         return best_action
             
