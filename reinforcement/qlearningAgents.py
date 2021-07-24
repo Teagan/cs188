@@ -132,7 +132,7 @@ class QLearningAgent(ReinforcementAgent):
           action = random.choice(legalActions)
         #else, best action
         else:
-          action = self.computeActionFromQValues(self, state)
+          action = self.computeActionFromQValues(state)
 
         return action
 
