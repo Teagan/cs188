@@ -128,7 +128,7 @@ class QLearningAgent(ReinforcementAgent):
           action = random.choice(legalActions)
         #else, best action
         else:
-          
+          action = self.computeActionFromQValues(self, state)
 
         return action
 
@@ -142,7 +142,13 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        # Q(s,a) = (1-\alpha)Q(s,a) + \alpha(sample)
+        # sample = R(s,a,s') + \gamma * max_a' Q(s',a')
+        sample = reward + self.discount * self.computeValueFromQValues(state)
+        new_q = (1 - self.alpha) * self.getQValue(state, action) + self.alpha * sample
+
+        self.q_values[(state, action)] = new_q
+        print(self.q_values)
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
