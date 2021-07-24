@@ -70,14 +70,14 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        if self.getLegalActions(state) == None: #assuming returns None if no legal actions
-          return 0.0
-
         max_val = -float('inf')
 
         for action in self.getLegalActions(state):
           val = self.getQValue(state, action)
           max_val = val if val > max_val else max_val
+
+        if max_val == -float('inf'):
+          return 0.0
 
         return max_val
 
@@ -90,16 +90,20 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        if self.getLegalActions(state) == None:
-          return None
-
         max_val = -float('inf')
         best_actions = []
 
         for action in self.getLegalActions(state):
           val = self.getQValue(state, action)
-          if val >= max_val:
+          if val > max_val:
+            best_actions.clear()
             best_actions.append(action)
+            max_val = val
+          elif val == max_val:
+            best_actions.append(action)
+
+        if max_val == -float('inf'):
+          return None
 
         return random.choice(best_actions) #get random best action
 
@@ -144,11 +148,10 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         # Q(s,a) = (1-\alpha)Q(s,a) + \alpha(sample)
         # sample = R(s,a,s') + \gamma * max_a' Q(s',a')
-        sample = reward + self.discount * self.computeValueFromQValues(state)
+        sample = reward + self.discount * self.computeValueFromQValues(nextState)
         new_q = (1 - self.alpha) * self.getQValue(state, action) + self.alpha * sample
 
         self.q_values[(state, action)] = new_q
-        print(self.q_values)
 
     def getPolicy(self, state):
         return self.computeActionFromQValues(state)
