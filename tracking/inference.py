@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 
+from hashlib import new
 import itertools
 import random
 import busters
@@ -301,7 +302,20 @@ class ExactInference(InferenceModule):
         position is known.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # Q2
+
+        # B(X_{i+1}) = \sum_{x_i} P(X_{i+1}, x_i) B(x_i)
+
+        # getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition)
+        #     Returns the probability P(noisyDistance | pacmanPosition, ghostPosition).
+
+        curr_beliefs = self.beliefs.copy()
+
+        for x in self.allPositions:
+            new_belief = 0
+            for pos in self.allPositions:
+                new_belief += self.getObservationProb(observation, gameState.getPacmanPosition(), x, self.getJailPosition()) * curr_beliefs[pos]
+            self.beliefs[x] = new_belief
 
         self.beliefs.normalize()
 
