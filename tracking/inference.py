@@ -304,7 +304,7 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         # Q2
-        
+
         # getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition)
         #     Returns the probability P(noisyDistance | pacmanPosition, ghostPosition)
 
@@ -376,7 +376,20 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # q3
+
+        # The elapseTime step should, for this problem, update the belief at every position on the map after one time step elapsing. 
+        # 
+        # self.getPositionDistribution is the action distribution of the ghost
+        # 
+        # Where oldPos refers to the previous ghost position. newPosDist is a DiscreteDistribution object, where for each 
+        # position p in self.allPositions, newPosDist[p] is the probability that the ghost is at position p at time t + 1, 
+        # given that the ghost is at position oldPos at time t.
+
+        for oldPos in self.allPositions:
+            newPosDist = self.getPositionDistribution(gameState, oldPos)
+            
+
 
     def getBeliefDistribution(self):
         """
