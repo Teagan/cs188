@@ -77,6 +77,8 @@ class DiscreteDistribution(dict):
         """
         "*** YOUR CODE HERE ***"
         total = self.total()
+        if total == 0:
+            return
         for key in self.keys(): 
             self[key] = self[key]/total
 
