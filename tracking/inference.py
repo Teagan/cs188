@@ -304,9 +304,7 @@ class ExactInference(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
         # Q2
-
-        # B(X_{i+1}) = \sum_{x_i} P(X_{i+1}, x_i) B(x_i)
-
+        
         # getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition)
         #     Returns the probability P(noisyDistance | pacmanPosition, ghostPosition)
 
