@@ -175,8 +175,7 @@ class InferenceModule:
 
     def getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition):
         """
-        Return the probability P(noisyDistance | pacmanPosition, ghostPosition).
-        """
+f        """
         "*** YOUR CODE HERE ***"
         # Q1
         # busters.getObservationProbability(noisyDistance, trueDistance) returns P(noisyDistance | trueDistance)
@@ -312,11 +311,9 @@ class ExactInference(InferenceModule):
         prev_beliefs = self.beliefs.copy()
 
         for curr_pos in self.allPositions:
-            curr_belief_sum = 0
-            for prev_pos in self.allPositions:
-                curr_belief_sum += self.getObservationProb(observation, gameState.getPacmanPosition(), prev_pos, self.getJailPosition()) * prev_beliefs[prev_pos]
-            self.beliefs[curr_pos] = curr_belief_sum
-
+            pacman = gameState.getPacmanPosition()
+            jail = self.getJailPosition()
+            self.beliefs[curr_pos] = self.getObservationProb(observation, pacman, curr_pos, jail) * prev_beliefs[curr_pos]
         self.beliefs.normalize()
 
     def elapseTime(self, gameState):
