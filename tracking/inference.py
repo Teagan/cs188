@@ -401,21 +401,20 @@ class ParticleFilter(InferenceModule):
         "*** YOUR CODE HERE ***"
 
         belief = self.getBeliefDistribution()
-        print("Belief :   ", belief)
 
-        # when all particles are zero weight
-        if belief.total() == 0:
-            self.initializeUniformly()
-            belief = self.getBeliefDistribution()
-        
         for ghost_loc in belief.keys():
             weight = self.getObservationProb(observation, gameState.getPacmanPosition(), ghost_loc, self.getJailPosition())
             belief[ghost_loc] = belief[ghost_loc] * weight
+
+        if belief.total() == 0:
+            self.initializeUniformly(gameState)
+            belief = self.getBeliefDistribution()
 
         self.particles = []
         
         for i in range(self.numParticles):
             self.particles.append(belief.sample())
+
 
     def elapseTime(self, gameState):
         """
@@ -423,7 +422,17 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        # q7
+
+        new_particles = []
+
+        for p in self.particles:
+            newPosDist = self.getPositionDistribution(gameState, p)
+            new_particles.append(newPosDist.sample())
+
+        self.particles = new_particles
+   
 
     def getBeliefDistribution(self):
         """
@@ -435,7 +444,11 @@ class ParticleFilter(InferenceModule):
         """
         "*** YOUR CODE HERE ***"
 
-        belief = DiscreteDistribution()       
+        belief = DiscreteDistribution()
+
+        for pos in self.legalPositions:
+            belief[pos] = 0
+
         for p in self.particles:
             belief[p] += 1
         belief.normalize()
@@ -467,7 +480,25 @@ class JointParticleFilter(ParticleFilter):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        # q8
+
+        for p in range(self.numParticles):
+            temp = []
+            for g in range(self.numGhosts):
+                loc = self.uniformLocation(self.legalPositions)
+                while loc in temp:
+                    loc = self.uniformLocation(self.legalPositions)
+                temp.append(loc)
+            self.particles.append(tuple(temp))
+
+    def uniformLocation(self, locations):
+        r = random.random()
+        base = 0.0
+        for loc in locations:
+            base += 1/len(locations)
+            if r <= base: return loc
+
 
     def addGhostAgent(self, agent):
         """
