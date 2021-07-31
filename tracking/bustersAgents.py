@@ -145,6 +145,8 @@ class GreedyBustersAgent(BustersAgent):
              if livingGhosts[i+1]]
         "*** YOUR CODE HERE ***"
 
+        # q4
+
         goal = None
         goal_dist = float('inf')
 
@@ -164,6 +166,6 @@ class GreedyBustersAgent(BustersAgent):
             action_dist = self.distancer.getDistance(successorPosition, goal)
             if action_dist < chosen_action_dist:
                 chosen_action = action
-                action_dist = chosen_action_dist
+                chosen_action_dist = action_dist
 
         return chosen_action
