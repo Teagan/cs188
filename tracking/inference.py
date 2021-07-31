@@ -308,13 +308,13 @@ class ExactInference(InferenceModule):
         # getObservationProb(self, noisyDistance, pacmanPosition, ghostPosition, jailPosition)
         #     Returns the probability P(noisyDistance | pacmanPosition, ghostPosition)
 
-        prev_beliefs = self.beliefs.copy()
+        prev_beliefs = self.getBeliefDistribution().copy()
 
         for curr_pos in self.allPositions:
             pacman = gameState.getPacmanPosition()
             jail = self.getJailPosition()
-            self.beliefs[curr_pos] = self.getObservationProb(observation, pacman, curr_pos, jail) * prev_beliefs[curr_pos]
-        self.beliefs.normalize()
+            self.getBeliefDistribution()[curr_pos] = self.getObservationProb(observation, pacman, curr_pos, jail) * prev_beliefs[curr_pos]
+        self.getBeliefDistribution().normalize()
 
     def elapseTime(self, gameState):
         """
@@ -338,18 +338,18 @@ class ExactInference(InferenceModule):
         # newPosDist[p] is the probability that the ghost is at position p at time t + 1, 
         # given that the ghost is at position oldPos at time t.
 
-        prev_beliefs = self.beliefs.copy()
+        prev_beliefs = self.getBeliefDistribution().copy()
 
         for curr_pos in self.allPositions:
-            self.beliefs[curr_pos] = 0.0
+            self.getBeliefDistribution()[curr_pos] = 0.0
 
             for oldPos in self.allPositions:
                 newPosDist = self.getPositionDistribution(gameState, oldPos)
-                self.beliefs[curr_pos] += newPosDist[curr_pos] * prev_beliefs[oldPos]
+                self.getBeliefDistribution()[curr_pos] += newPosDist[curr_pos] * prev_beliefs[oldPos]
 
         # self.beliefs[gameState.gameState.getPacmanPosition()] = 0.0
 
-        self.beliefs.normalize()        
+        self.getBeliefDistribution().normalize()        
 
     def getBeliefDistribution(self):
         return self.beliefs
@@ -376,7 +376,15 @@ class ParticleFilter(InferenceModule):
         """
         self.particles = []
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        for p in range(self.numParticles):
+            self.particles.append(self.randomLocation(self.legalPositions))
+
+    def randomLocation(self, locations):
+        r = random.random()
+        base = 0.0
+        for loc in locations:
+            base += 1/len(locations)
+            if r <= base: return loc
 
     def observeUpdate(self, observation, gameState):
         """
@@ -410,7 +418,13 @@ class ParticleFilter(InferenceModule):
         This function should return a normalized distribution.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        belief = DiscreteDistribution()       
+        for p in self.particles:
+            belief[p] += 1
+        belief.normalize()
+        return belief
+
 
 
 class JointParticleFilter(ParticleFilter):
