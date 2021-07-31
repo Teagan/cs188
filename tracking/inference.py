@@ -326,7 +326,30 @@ class ExactInference(InferenceModule):
         current position is known.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+        # q3
+
+        # The elapseTime step should, for this problem, update the belief at every position 
+        # on the map after one time step elapsing. 
+        # 
+        # self.getPositionDistribution is the action distribution of the ghost
+        # 
+        # Where oldPos refers to the previous ghost position. newPosDist is a 
+        # DiscreteDistribution object, where for each position p in self.allPositions, 
+        # newPosDist[p] is the probability that the ghost is at position p at time t + 1, 
+        # given that the ghost is at position oldPos at time t.
+
+        prev_beliefs = self.beliefs.copy()
+
+        for curr_pos in self.allPositions:
+            self.beliefs[curr_pos] = 0.0
+
+            for oldPos in self.allPositions:
+                newPosDist = self.getPositionDistribution(gameState, oldPos)
+                self.beliefs[curr_pos] += newPosDist[curr_pos] * prev_beliefs[oldPos]
+
+        # self.beliefs[gameState.gameState.getPacmanPosition()] = 0.0
+
+        self.beliefs.normalize()        
 
     def getBeliefDistribution(self):
         return self.beliefs
@@ -376,20 +399,7 @@ class ParticleFilter(InferenceModule):
         gameState.
         """
         "*** YOUR CODE HERE ***"
-        # q3
-
-        # The elapseTime step should, for this problem, update the belief at every position on the map after one time step elapsing. 
-        # 
-        # self.getPositionDistribution is the action distribution of the ghost
-        # 
-        # Where oldPos refers to the previous ghost position. newPosDist is a DiscreteDistribution object, where for each 
-        # position p in self.allPositions, newPosDist[p] is the probability that the ghost is at position p at time t + 1, 
-        # given that the ghost is at position oldPos at time t.
-
-        for oldPos in self.allPositions:
-            newPosDist = self.getPositionDistribution(gameState, oldPos)
-            
-
+        raiseNotDefined()
 
     def getBeliefDistribution(self):
         """
