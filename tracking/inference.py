@@ -377,9 +377,9 @@ class ParticleFilter(InferenceModule):
         self.particles = []
         "*** YOUR CODE HERE ***"
         for p in range(self.numParticles):
-            self.particles.append(self.randomLocation(self.legalPositions))
+            self.particles.append(self.randomUniformLocation(self.legalPositions))
 
-    def randomLocation(self, locations):
+    def randomUniformLocation(self, locations):
         r = random.random()
         base = 0.0
         for loc in locations:
@@ -399,7 +399,23 @@ class ParticleFilter(InferenceModule):
         the DiscreteDistribution may be useful.
         """
         "*** YOUR CODE HERE ***"
-        raiseNotDefined()
+
+        belief = self.getBeliefDistribution()
+        print("Belief :   ", belief)
+
+        # when all particles are zero weight
+        if belief.total() == 0:
+            self.initializeUniformly()
+            belief = self.getBeliefDistribution()
+        
+        for ghost_loc in belief.keys():
+            weight = self.getObservationProb(observation, gameState.getPacmanPosition(), ghost_loc, self.getJailPosition())
+            belief[ghost_loc] = belief[ghost_loc] * weight
+
+        self.particles = []
+        
+        for i in range(self.numParticles):
+            self.particles.append(belief.sample())
 
     def elapseTime(self, gameState):
         """
@@ -424,7 +440,6 @@ class ParticleFilter(InferenceModule):
             belief[p] += 1
         belief.normalize()
         return belief
-
 
 
 class JointParticleFilter(ParticleFilter):
