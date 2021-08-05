@@ -27,6 +27,9 @@ class PerceptronModel(object):
         Returns: a node containing a single number (the score)
         """
         "*** YOUR CODE HERE ***"
+        # Implement the run(self, x) method. This should compute 
+        # the dot product of the stored weight vector and the given 
+        # input, returning an nn.DotProduct object.
 
     def get_prediction(self, x):
         """
@@ -35,12 +38,28 @@ class PerceptronModel(object):
         Returns: 1 or -1
         """
         "*** YOUR CODE HERE ***"
+        # Implement get_prediction(self, x), which should return 1 if 
+        # the dot product is non-negative or −1 otherwise. You should use 
+        # nn.as_scalar to convert a scalar Node into a Python floating-point 
+        # number.
 
     def train(self, dataset):
         """
         Train the perceptron until convergence.
         """
         "*** YOUR CODE HERE ***"
+        # Write the train(self) method. This should repeatedly loop over 
+        # the data set and make updates on examples that are misclassified. 
+        # Use the update method of the nn.Parameter class to update the 
+        # weights. When an entire pass over the data set is completed without 
+        # making any mistakes, 100% training accuracy has been achieved, and 
+        # training can terminate.
+        # 
+        # In this project, the only way to change the value of a parameter is 
+        # by calling parameter.update(direction, multiplier), which will perform 
+        # the update to the weights: weights = weights + direction * multiplier 
+        # The direction argument is a Node with the same shape as the parameter, 
+        # and the multiplier argument is a Python scalar.
 
 class RegressionModel(object):
     """
