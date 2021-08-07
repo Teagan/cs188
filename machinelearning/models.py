@@ -30,6 +30,10 @@ class PerceptronModel(object):
         # Implement the run(self, x) method. This should compute 
         # the dot product of the stored weight vector and the given 
         # input, returning an nn.DotProduct object.
+        # nn.DotProduct(features, weights)
+
+        weights = self.get_weights()
+        return nn.DotProduct(x, weights) 
 
     def get_prediction(self, x):
         """
