@@ -30,10 +30,11 @@ class PerceptronModel(object):
         # Implement the run(self, x) method. This should compute 
         # the dot product of the stored weight vector and the given 
         # input, returning an nn.DotProduct object.
+
         # nn.DotProduct(features, weights)
 
         weights = self.get_weights()
-        return nn.DotProduct(x, weights) 
+        return nn.DotProduct(x, weights)
 
     def get_prediction(self, x):
         """
@@ -46,6 +47,11 @@ class PerceptronModel(object):
         # the dot product is non-negative or −1 otherwise. You should use 
         # nn.as_scalar to convert a scalar Node into a Python floating-point 
         # number.
+
+        if nn.as_scalar(self.run(x)) < 0:
+            return -1
+        return 1
+        
 
     def train(self, dataset):
         """
@@ -64,6 +70,22 @@ class PerceptronModel(object):
         # the update to the weights: weights = weights + direction * multiplier 
         # The direction argument is a Node with the same shape as the parameter, 
         # and the multiplier argument is a Python scalar.
+
+        # update(self, direction, multiplier)
+
+        # train until no misclassifications in one full sweep
+        done = False
+
+        while not done:
+            for i in range(len(dataset.x)):
+                print("x[i] :  ", dataset.x[i], ",  y[i] :  ", dataset.y[i])
+                pred = self.get_prediction(nn.Parameter(dataset.x[i][0], dataset.x[i][1]))
+                if pred != dataset.y[i][0]:
+                    dataset.x[i].update(dataset.x[i], pred)
+                    break
+                if i == (len(dataset.x) - 1):
+                    done = True
+
 
 class RegressionModel(object):
     """
