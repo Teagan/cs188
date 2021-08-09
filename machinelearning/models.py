@@ -79,9 +79,10 @@ class PerceptronModel(object):
         while not done:
             for i in range(len(dataset.x)):
                 print("x[i] :  ", dataset.x[i], ",  y[i] :  ", dataset.y[i])
-                pred = self.get_prediction(nn.Parameter(dataset.x[i][0], dataset.x[i][1]))
+                pred = self.get_prediction(nn.Constant(dataset.x[i]))
+                print("prediction:  ", pred)
                 if pred != dataset.y[i][0]:
-                    dataset.x[i].update(dataset.x[i], pred)
+                    self.update(self.get_weights(), pred)
                     break
                 if i == (len(dataset.x) - 1):
                     done = True
