@@ -77,15 +77,21 @@ class PerceptronModel(object):
         done = False
 
         while not done:
+            updated = False
             for i in range(len(dataset.x)):
-                print("x[i] :  ", dataset.x[i], ",  y[i] :  ", dataset.y[i])
-                pred = self.get_prediction(nn.Constant(dataset.x[i]))
-                print("prediction:  ", pred)
-                if pred != dataset.y[i][0]:
-                    self.update(self.get_weights(), pred)
-                    break
-                if i == (len(dataset.x) - 1):
-                    done = True
+                for x, y in dataset.iterate_once(1):
+                    pred = self.get_prediction(x)
+                    if pred != nn.as_scalar(y):
+                        # print(i, "th loop:\n==================")
+                        # print("pred: [", pred, "],   y : [", nn.as_scalar(y), "]")
+                        # print("old weights: ", self.get_weights().data)
+                        self.get_weights().update(x, nn.as_scalar(y))
+                        updated = True
+                        # print("updated to: ", self.get_weights().data)
+                        # print("==================")
+                        break
+            if updated == False:
+                done = True
 
 
 class RegressionModel(object):
@@ -97,6 +103,35 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        dimensions = 1 #dimension of a single data point
+        self.w1 = nn.Parameter(1, dimensions)
+        self.w2 = nn.Parameter(1, dimensions)
+        self.b1 = nn.Parameter(2, 1)
+        self.b2 = nn.Parameter(2, 1)
+
+    def get_w1(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.w1
+
+    def get_w2(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.w2
+
+    def get_b1(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.b1
+
+    def get_b2(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.b2
 
     def run(self, x):
         """
@@ -109,6 +144,20 @@ class RegressionModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+        height = x.data.shape[0]
+        width = x.data.shape[1]
+
+
+        x_times_W_1 = nn.Linear(x, self.get_w1())
+        x_times_W_1_plus_b_1 = nn.Add(x_times_W_1, self.get_b1())
+        relu_result = nn.ReLU(x_times_W_1_plus_b_1)
+        relu_times_W_2 = nn.Linear(relu_result, self.get_w2())
+        result = nn.Add(relu_times_W_2, self.get_b2())
+
+        return result
+        return x
+
+
     def get_loss(self, x, y):
         """
         Computes the loss for a batch of examples.
@@ -120,12 +169,31 @@ class RegressionModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        y_star = self.run(x)
+        return nn.SquareLoss(y_star, y)
+
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        done = False
+        batch_size = 1
+
+        while not done:
+            updated = False
+            for i in range(len(dataset.x)):
+                for x, y in dataset.iterate_once(batch_size):
+                    pred = self.get_prediction(x)
+                    if pred != nn.as_scalar(y):
+                        self.get_weights().update(x, nn.as_scalar(y))
+                        updated = True
+                        break
+            if updated == False:
+                done = True
+
+
 
 class DigitClassificationModel(object):
     """
