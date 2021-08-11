@@ -35,7 +35,7 @@ class QLearningAgent(ReinforcementAgent):
         self.qVals = {}
         self.eval = False
 
-    def getQValue(self, state, action):
+    def getQValue(self, state, action): # FILL IN
         """
           Returns Q(state,action)
           Should return 0.0 if we have never seen a state
@@ -58,7 +58,7 @@ class QLearningAgent(ReinforcementAgent):
 
         return random.choice(bestAct), bestVal
 
-    def computeValueFromQValues(self, state):
+    def computeValueFromQValues(self, state):  # FILL IN
         """
           Returns max_action Q(state,action)
           where the max is over legal actions.  Note that if
@@ -68,7 +68,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         return self.getPolicyAndValue(state)[1]
 
-    def computeActionFromQValues(self, state):
+    def computeActionFromQValues(self, state):  # FILL IN
         """
           Compute the best action to take in a state.  Note that if there
           are no legal actions, which is the case at the terminal state,
@@ -77,7 +77,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         return self.getPolicyAndValue(state)[0]
 
-    def getAction(self, state):
+    def getAction(self, state): # FILL IN
         """
           Compute the action to take in the current state.  With
           probability self.epsilon, we should take a random action and
@@ -98,7 +98,7 @@ class QLearningAgent(ReinforcementAgent):
 
         return action
 
-    def update(self, state, action, nextState, reward):
+    def update(self, state, action, nextState, reward): # FILL IN
         """
           The parent class calls this to observe a
           state = action => nextState and reward transition.
@@ -245,8 +245,12 @@ class PacmanDeepQAgent(PacmanQAgent):
 
         # These are placeholders. You should assign correct values for these two variables according to the specs.
         # Note that this doesn't mean you should only use two lines of code. For your reference, the staff solution uses 10 lines.
-        Q_predict = None # a numpy array of Q network's prediction of size (batch_size x num_actions) on states.
-        Q_target = None # a numpy array of Q target of size (batch_size x num_actions)
+        Q_predict = self.getQValue(states_np, actions[0]) # a numpy array of Q network's prediction of size (batch_size x num_actions) on states.
+        Q_target = copy.deepcopy(Q_predict) # a numpy array of Q target of size (batch_size x num_actions)
+        Q_next_predict = network(states)
+        Q_next_target = Q_predict(states)
+
+
 
         "*** YOUR CODE ENDS HERE ***"
 

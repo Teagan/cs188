@@ -408,6 +408,8 @@ class DeepQModel(object):
         "*** YOUR CODE HERE ***"
 
 
+
+
     def gradient_update(self, states, Q_target):
         """
         Update your parameters by one gradient step with the .update(...) function.
@@ -418,4 +420,9 @@ class DeepQModel(object):
             None
         """
         "*** YOUR CODE HERE ***"
-        w1.update(w1grad, alpha)
+        loss = self.get_loss(states, Q_target)
+        w1grad, b1grad, w2grad, b2grad = nn.gradients(loss, [self.w1, self.b1, self.w2, self.b2])
+        self.w1.update(w1grad, -self.learning_rate)
+        self.w2.update(w2grad, -self.learning_rate)
+        self.b1.update(b1grad, -self.learning_rate)
+        self.b2.update(b2grad, -self.learning_rate)
