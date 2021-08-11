@@ -103,11 +103,15 @@ class RegressionModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
-        dimensions = 1 #dimension of a single data point
-        self.w1 = nn.Parameter(1, dimensions)
-        self.w2 = nn.Parameter(1, dimensions)
-        self.b1 = nn.Parameter(2, 1)
-        self.b2 = nn.Parameter(2, 1)
+        # batch_size = 1 
+        your_hidden_layer_size = 200
+        dimension = 1
+        self.w1 = nn.Parameter(dimension, your_hidden_layer_size)
+        self.b1 = nn.Parameter(1, your_hidden_layer_size)
+        self.w2 = nn.Parameter(your_hidden_layer_size, 1)
+        self.b2 = nn.Parameter(1, 1)
+
+        self.learning_rate = 0.01
 
     def get_w1(self):
         """
@@ -144,18 +148,15 @@ class RegressionModel(object):
         """
         "*** YOUR CODE HERE ***"
 
-        height = x.data.shape[0]
-        width = x.data.shape[1]
-
+        # relu( x * w_1 + b_1 ) * w_2 + b_2
 
         x_times_W_1 = nn.Linear(x, self.get_w1())
-        x_times_W_1_plus_b_1 = nn.Add(x_times_W_1, self.get_b1())
+        x_times_W_1_plus_b_1 = nn.AddBias(x_times_W_1, self.get_b1())
         relu_result = nn.ReLU(x_times_W_1_plus_b_1)
         relu_times_W_2 = nn.Linear(relu_result, self.get_w2())
-        result = nn.Add(relu_times_W_2, self.get_b2())
+        result = nn.AddBias(relu_times_W_2, self.get_b2())
 
         return result
-        return x
 
 
     def get_loss(self, x, y):
@@ -179,15 +180,29 @@ class RegressionModel(object):
         """
         "*** YOUR CODE HERE ***"
         done = False
-        batch_size = 1
+        batch_size = 20
+        w1 = self.get_w1()
+        w2 = self.get_w2()
+        b1 = self.get_b1()
+        b2 = self.get_b2()
+        alpha = -1 * self.learning_rate
 
         while not done:
             updated = False
             for i in range(len(dataset.x)):
                 for x, y in dataset.iterate_once(batch_size):
-                    pred = self.get_prediction(x)
-                    if pred != nn.as_scalar(y):
-                        self.get_weights().update(x, nn.as_scalar(y))
+                    loss = self.get_loss(x, y)
+                    if nn.as_scalar(loss) > 0.02:
+                        w1grad, w2grad, b1grad, b2grad = nn.gradients(loss, [w1, w2, b1, b2])
+                        w1.update(w1grad, alpha)
+                        w2.update(w2grad, alpha)
+                        b1.update(b1grad, alpha)
+                        b2.update(b2grad, alpha)
+
+                        # print("w1:  [", w1.data, "]")
+                        # print("w2:  [", w2.data, "]")
+                        # print("b1:  [", b1.data, "]")
+                        # print("b2:  [", b2.data, "]")
                         updated = True
                         break
             if updated == False:
@@ -212,6 +227,52 @@ class DigitClassificationModel(object):
     def __init__(self):
         # Initialize your model parameters here
         "*** YOUR CODE HERE ***"
+        your_hidden_layer_size = 1000
+        dimension = 784
+        self.w1 = nn.Parameter(dimension, your_hidden_layer_size)
+        self.b1 = nn.Parameter(1, your_hidden_layer_size)
+        self.w2 = nn.Parameter(your_hidden_layer_size, 10)
+        self.b2 = nn.Parameter(1, 10)
+        # self.w3 = nn.Parameter(your_hidden_layer_size, 10)
+        # self.b3 = nn.Parameter(1, 10)
+
+        self.learning_rate = 0.5
+
+    def get_w1(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.w1
+
+    def get_w2(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.w2
+
+    # def get_w3(self):
+    #     """
+    #     Return a Parameter instance with the current weights of the perceptron.
+    #     """
+    #     return self.w3
+
+    def get_b1(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.b1
+
+    def get_b2(self):
+        """
+        Return a Parameter instance with the current weights of the perceptron.
+        """
+        return self.b2
+
+    # def get_b3(self):
+    #     """
+    #     Return a Parameter instance with the current weights of the perceptron.
+    #     """
+    #     return self.b3
 
     def run(self, x):
         """
@@ -229,6 +290,20 @@ class DigitClassificationModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+        # relu( x * w_1 + b_1 ) * w_2 + b_2 
+
+        x_times_W_1 = nn.Linear(x, self.get_w1())
+        x_times_W_1_plus_b_1 = nn.AddBias(x_times_W_1, self.get_b1())
+        relu_result = nn.ReLU(x_times_W_1_plus_b_1)
+        relu_times_W_2 = nn.Linear(relu_result, self.get_w2())
+        result = nn.AddBias(relu_times_W_2, self.get_b2())
+
+        # temp1 = nn.ReLU(result)
+        # temp2 = nn.Linear(temp1, self.get_w3())
+        # temp3 = nn.AddBias(temp2, self.get_b3())
+
+        return result
+
     def get_loss(self, x, y):
         """
         Computes the loss for a batch of examples.
@@ -243,12 +318,42 @@ class DigitClassificationModel(object):
         Returns: a loss node
         """
         "*** YOUR CODE HERE ***"
+        y_star = self.run(x)
+        return nn.SoftmaxLoss(y_star, y)
+
 
     def train(self, dataset):
         """
         Trains the model.
         """
         "*** YOUR CODE HERE ***"
+        done = False
+        batch_size = 200
+        w1 = self.get_w1()
+        w2 = self.get_w2()
+        # w3 = self.get_w3()
+        b1 = self.get_b1()
+        b2 = self.get_b2()
+        # b3 = self.get_b3()
+        alpha = -1 * self.learning_rate
+
+        while True:
+            for x, y in dataset.iterate_once(batch_size):
+                if dataset.get_validation_accuracy() > 0.975: # QUICK, QUIT!! IT'S DONE!!
+                    return
+                loss = self.get_loss(x, y)
+                w1grad, b1grad, w2grad, b2grad = nn.gradients(loss, [w1, b1, w2, b2])
+                w1.update(w1grad, alpha)
+                w2.update(w2grad, alpha)
+                b1.update(b1grad, alpha)
+                b2.update(b2grad, alpha)
+
+                # print("w1:  [", w1.data, "]")
+                # print("w2:  [", w2.data, "]")
+                # print("b1:  [", b1.data, "]")
+                # print("b2:  [", b2.data, "]")
+                # print("current accuracy :  ", dataset.get_validation_accuracy())
+
 
 class DeepQModel(object):
     """
@@ -262,9 +367,16 @@ class DeepQModel(object):
         # Remember to set self.learning_rate, self.numTrainingGames,
         # self.parameters, and self.batch_size!
         "*** YOUR CODE HERE ***"
-        self.learning_rate = None
-        self.numTrainingGames = None
-        self.batch_size = None
+        self.learning_rate = 0.5
+        self.numTrainingGames = 800
+        self.batch_size = 1000
+
+        your_hidden_layer_size = 1000
+        self.w1 = nn.Parameter(state_dim, your_hidden_layer_size)
+        self.b1 = nn.Parameter(1, your_hidden_layer_size)
+        self.w2 = nn.Parameter(your_hidden_layer_size, action_dim)
+        self.b2 = nn.Parameter(1, action_dim)
+
 
     def get_loss(self, states, Q_target):
         """
@@ -277,6 +389,9 @@ class DeepQModel(object):
             loss node between Q predictions and Q_target
         """
         "*** YOUR CODE HERE ***"
+        Q_pred = self.run(states)
+        return nn.SquareLoss(Q_pred, Q_target)
+
 
     def run(self, states):
         """
@@ -292,6 +407,7 @@ class DeepQModel(object):
         """
         "*** YOUR CODE HERE ***"
 
+
     def gradient_update(self, states, Q_target):
         """
         Update your parameters by one gradient step with the .update(...) function.
@@ -302,3 +418,4 @@ class DeepQModel(object):
             None
         """
         "*** YOUR CODE HERE ***"
+        w1.update(w1grad, alpha)
